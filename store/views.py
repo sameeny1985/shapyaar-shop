@@ -3,7 +3,43 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.conf import settings
+from django.urls import reverse
+import stripe
+import requests
 from .models import Product, Category, Cart, CartItem, Order, OrderItem
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+def send_telegram_order_notification(order):
+    if not settings.TELEGRAM_BOT_TOKEN or not settings.TELEGRAM_CHAT_ID:
+        return
+
+    items_text = ""
+    for item in order.items.all():
+        items_text += f"▫️ {item.product_name} | تعداد: {item.quantity} | قیمت: {item.price}\n"
+
+    message = (
+        f"🚀 *سفارش موفق جدید در Sory Shop ثبت شد!*\n\n"
+        f"🆔 شماره سفارش: {order.id}\n"
+        f"👤 نام خریدار: {order.full_name}\n"
+        f"📞 تلفن: {order.phone}\n"
+        f"📍 شهر/آدرس: {order.city} - {order.address}\n\n"
+        f"📦 *اقلام خریداری شده:*\n{items_text}\n"
+        f"💰 *مبلغ کل:* {order.total_price}"
+    )
+
+    url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": settings.TELEGRAM_CHAT_ID,
+        "text": message,
+        "parse_mode": "Markdown"
+    }
+    try:
+        requests.post(url, json=payload, timeout=10)
+    except Exception as e:
+        print("Telegram Error:", e)
 
 
 def get_or_create_cart(request):
@@ -155,9 +191,37 @@ def checkout(request):
             # Reduce stock
             item.product.stock -= item.quantity
             item.product.save()
+        
+        # پاکسازی سبد خرید
         cart.items.all().delete()
-        messages.success(request, f'سفارش شما با شماره #{order.id} ثبت شد. به زودی با شما تماس می‌گیریم.')
-        return redirect('store:order_success', order_id=order.id)
+
+        # ساخت سشن پرداخت استریپ و هدایت به درگاه
+        domain = request.build_absolute_uri('/')[:-1]
+        line_items = []
+        for item in order.items.all():
+            line_items.append({
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': item.product_name,
+                    },
+                    'unit_amount': int(float(item.price) * 100),
+                },
+                'quantity': item.quantity,
+            })
+
+        try:
+            checkout_session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=line_items,
+                mode='payment',
+                success_url=domain + reverse('store:payment_success') + f'?order_id={order.id}',
+                cancel_url=domain + reverse('store:payment_cancel'),
+            )
+            return redirect(checkout_session.url, code=303)
+        except Exception as e:
+            messages.error(request, f'خطا در اتصال به درگاه پرداخت: {e}')
+            return redirect('store:cart')
 
     return render(request, 'store/checkout.html', {'cart': cart})
 
@@ -172,3 +236,25 @@ def order_success(request, order_id):
 def my_orders(request):
     orders = Order.objects.filter(user=request.user)
     return render(request, 'store/my_orders.html', {'orders': orders})
+
+
+def payment_success_view(request):
+    order_id = request.GET.get('order_id')
+    order = None
+    if order_id:
+        try:
+            order = Order.objects.get(id=order_id)
+            if not getattr(order, 'is_paid', False):
+                order.is_paid = True
+                order.status = 'paid'
+                order.save()
+                # ارسال گزارش موفقیت به کانال تلگرام
+                send_telegram_order_notification(order)
+        except Order.DoesNotExist:
+            pass
+    return render(request, 'store/order_success.html', {'order': order})
+
+
+def payment_cancel_view(request):
+    messages.warning(request, 'عملیات پرداخت لغو شد.')
+    return redirect('store:cart')
