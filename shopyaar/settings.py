@@ -294,9 +294,7 @@ CLOUDINARY_STORAGE = {
 # DEFAULT MEDIA STORAGE
 # ============================================================
 
-DEFAULT_FILE_STORAGE = (
-    'cloudinary_storage.storage.MediaCloudinaryStorage'
-)
+DEFAULT_FILE_STORAGE = 'store.storage.OriginalExtensionCloudinaryStorage'
 
 
 # ============================================================
