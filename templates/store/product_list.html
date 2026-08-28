@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Products | Shopyaar{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row gap-8">
+        <aside class="md:w-56 shrink-0">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 sticky top-24">
+                <h3 class="font-bold text-slate-800 mb-4">Categories</h3>
+                <ul class="space-y-1">
+                    <li>
+                        <a href="{% url 'store:product_list' %}" class="block px-3 py-2 rounded-lg text-sm {% if not current_category %}bg-primary-50 text-primary-700 font-medium{% else %}text-slate-600 hover:bg-slate-50{% endif %}">All Products</a>
+                    </li>
+                    {% for cat in categories %}
+                    <li>
+                        <a href="{% url 'store:product_list' %}?category={{ cat.slug }}" class="block px-3 py-2 rounded-lg text-sm {% if current_category == cat.slug %}bg-primary-50 text-primary-700 font-medium{% else %}text-slate-600 hover:bg-slate-50{% endif %}">{{ cat.name }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </aside>
+
+        <div class="flex-1">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <h1 class="text-2xl font-bold text-slate-800">
+                    {% if search_query %}Results for "{{ search_query }}"{% else %}Products{% endif %}
+                </h1>
+                <form method="get" class="flex items-center gap-2">
+                    {% if current_category %}<input type="hidden" name="category" value="{{ current_category }}">{% endif %}
+                    {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
+                    <select name="sort" onchange="this.form.submit()" class="text-sm border border-slate-200 rounded-xl px-3 py-2 bg-white focus:ring-2 focus:ring-primary-400">
+                        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+                        <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="name" {% if sort == 'name' %}selected{% endif %}>Name</option>
+                    </select>
+                </form>
+            </div>
+
+            {% if products %}
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-5">
+                {% for product in products %}
+                {% include 'store/partials/product_card.html' %}
+                {% endfor %}
+            </div>
+            {% if products.has_other_pages %}
+            <div class="flex justify-center gap-2 mt-10">
+                {% if products.has_previous %}
+                <a href="?page={{ products.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}&sort={{ sort }}" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-sm hover:bg-slate-50">Previous</a>
+                {% endif %}
+                <span class="px-4 py-2 text-sm text-slate-500">Page {{ products.number }} of {{ products.paginator.num_pages }}</span>
+                {% if products.has_next %}
+                <a href="?page={{ products.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}&sort={{ sort }}" class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-sm hover:bg-slate-50">Next</a>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="text-center py-20 bg-white rounded-2xl border border-slate-100">
+                <p class="text-slate-400 text-lg">No products found.</p>
+                <p class="text-sm mt-2 text-slate-400">Add products from the <a href="/admin/" class="text-primary-600 underline">Admin Panel</a>.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

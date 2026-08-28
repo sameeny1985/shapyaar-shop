@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} | Shopyaar{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-10">
+    <div class="grid md:grid-cols-2 gap-10">
+        <div class="bg-white rounded-3xl overflow-hidden shadow-lg border border-slate-100">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full aspect-square object-cover">
+            {% else %}
+            <div class="aspect-square bg-slate-100 flex items-center justify-center text-6xl text-slate-300">📦</div>
+            {% endif %}
+        </div>
+        <div class="flex flex-col">
+            <span class="text-sm text-primary-600 font-medium mb-2">{{ product.category.name }}</span>
+            <h1 class="text-3xl font-bold text-slate-800 mb-4">{{ product.name }}</h1>
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl font-extrabold text-primary-700">€{{ product.final_price|floatformat:2 }}</span>
+                {% if product.has_discount %}
+                <span class="text-lg text-slate-400 line-through">€{{ product.price|floatformat:2 }}</span>
+                <span class="bg-red-100 text-red-600 text-sm font-bold px-2.5 py-1 rounded-full">{{ product.discount_percent }}% OFF</span>
+                {% endif %}
+            </div>
+            <div class="prose prose-slate text-slate-600 mb-8 leading-relaxed">{{ product.description|linebreaks }}</div>
+            <div class="flex items-center gap-2 mb-6 text-sm">
+                {% if product.stock > 0 %}
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span class="text-emerald-600 font-medium">In Stock ({{ product.stock }})</span>
+                {% else %}
+                <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                <span class="text-red-600 font-medium">Out of Stock</span>
+                {% endif %}
+            </div>
+            {% if product.stock > 0 %}
+            <a href="{% url 'store:add_to_cart' product.id %}" class="btn-primary text-white text-center py-3.5 rounded-2xl font-bold shadow-lg hover:shadow-xl transition text-lg">
+                Add to Cart
+            </a>
+            {% else %}
+            <button disabled class="bg-slate-200 text-slate-500 text-center py-3.5 rounded-2xl font-bold cursor-not-allowed">Out of Stock</button>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if related_products %}
+    <section class="mt-16">
+        <h2 class="text-2xl font-bold text-slate-800 mb-6">Related Products</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+            {% for product in related_products %}
+            {% include 'store/partials/product_card.html' %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

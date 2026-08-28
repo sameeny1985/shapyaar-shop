@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Shopyaar | Home{% endblock %}
+
+{% block content %}
+<section class="relative overflow-hidden">
+    <div class="gradient-bg absolute inset-0 opacity-95"></div>
+    <div class="relative max-w-7xl mx-auto px-4 py-20 md:py-28 text-center text-white">
+        <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
+            Smart Shopping,<br>
+            <span class="text-amber-300">Better Experience</span>
+        </h1>
+        <p class="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto mb-10">Quality products at fair prices. Fast shipping worldwide.</p>
+        <a href="{% url 'store:product_list' %}" class="inline-flex items-center gap-2 bg-white text-primary-700 font-bold px-8 py-3.5 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+            Browse Products
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+    </div>
+</section>
+
+{% if categories %}
+<section class="max-w-7xl mx-auto px-4 -mt-10 relative z-10">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {% for cat in categories %}
+        <a href="{% url 'store:product_list' %}?category={{ cat.slug }}" class="bg-white rounded-2xl p-4 shadow-lg card-hover text-center border border-slate-100">
+            <div class="w-14 h-14 mx-auto mb-3 rounded-xl bg-primary-50 flex items-center justify-center text-primary-600 text-2xl font-bold">
+                {{ cat.name|first }}
+            </div>
+            <span class="text-sm font-medium text-slate-700">{{ cat.name }}</span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if featured_products %}
+<section class="max-w-7xl mx-auto px-4 py-16">
+    <div class="flex items-center justify-between mb-8">
+        <h2 class="text-2xl md:text-3xl font-bold text-slate-800">Featured Products</h2>
+        <a href="{% url 'store:product_list' %}" class="text-primary-600 font-medium hover:underline text-sm">View all</a>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+        {% for product in featured_products %}
+        {% include 'store/partials/product_card.html' %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section class="max-w-7xl mx-auto px-4 py-8 pb-16">
+    <div class="flex items-center justify-between mb-8">
+        <h2 class="text-2xl md:text-3xl font-bold text-slate-800">Latest Products</h2>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+        {% for product in latest_products %}
+        {% include 'store/partials/product_card.html' %}
+        {% endfor %}
+    </div>
+    {% if not latest_products %}
+    <div class="text-center py-20 text-slate-400">
+        <p class="text-lg">No products yet.</p>
+        <p class="text-sm mt-2">Go to <a href="/admin/" class="text-primary-600 underline">Admin Panel</a> to add products.</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
