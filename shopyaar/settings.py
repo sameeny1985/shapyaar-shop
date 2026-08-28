@@ -294,14 +294,72 @@ CLOUDINARY_STORAGE = {
 # DEFAULT MEDIA STORAGE
 # ============================================================
 
-DEFAULT_FILE_STORAGE = 'store.storage.OriginalExtensionCloudinaryStorage'
+# ============================================================
+# CLOUDINARY CONFIGURATION
+# ============================================================
 
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get(
+        'CLOUDINARY_CLOUD_NAME'
+    ),
+
+    'API_KEY': os.environ.get(
+        'CLOUDINARY_API_KEY'
+    ),
+
+    'API_SECRET': os.environ.get(
+        'CLOUDINARY_API_SECRET'
+    ),
+
+    'SECURE': True,
+
+    'MEDIA_TAG': 'shopyaar',
+
+    'PREFIX': 'shopyaar/',
+}
+
+
+# ============================================================
+# DJANGO FILE STORAGES
+# ============================================================
+
+STORAGES = {
+
+    # --------------------------------------------------------
+    # USER UPLOADED FILES
+    # --------------------------------------------------------
+
+    'default': {
+
+        'BACKEND':
+            'cloudinary_storage.storage.MediaCloudinaryStorage',
+
+    },
+
+    # --------------------------------------------------------
+    # STATIC FILES
+    # --------------------------------------------------------
+
+    'staticfiles': {
+
+        'BACKEND':
+            'whitenoise.storage.CompressedManifestStaticFilesStorage',
+
+    },
+
+}
+
+
+# ============================================================
+# MEDIA
+# ============================================================
+
+MEDIA_URL = '/media/'
 
 # ============================================================
 # MEDIA URL
 # ============================================================
 
-MEDIA_URL = '/media/'
 
 
 # ============================================================
