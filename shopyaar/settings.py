@@ -163,6 +163,12 @@ SOCIALACCOUNT_PROVIDERS = {
 # Admin email
 ADMIN_EMAIL = 'shapyaar@gmail.com'
 
+# Stripe & Telegram Settings
+STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', '')
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', '')
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID', '')
+
 # Security for production
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
