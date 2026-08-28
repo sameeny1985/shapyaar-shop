@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}سفارش ثبت شد | شاپیار{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto px-4 py-20 text-center">
+    <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-emerald-100 flex items-center justify-center">
+        <svg class="w-10 h-10 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <h1 class="text-3xl font-bold text-slate-800 mb-3">سفارش شما ثبت شد!</h1>
+    <p class="text-slate-500 mb-2">شماره سفارش: <span class="font-bold text-primary-700">#{{ order.id }}</span></p>
+    <p class="text-slate-500 mb-8">به زودی برای هماهنگی ارسال با شما تماس می‌گیریم.</p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="{% url 'store:my_orders' %}" class="btn-primary text-white px-6 py-2.5 rounded-full font-medium">سفارش‌های من</a>
+        <a href="{% url 'store:product_list' %}" class="bg-slate-100 text-slate-700 px-6 py-2.5 rounded-full font-medium hover:bg-slate-200 transition">ادامه خرید</a>
+    </div>
+</div>
+{% endblock %}
