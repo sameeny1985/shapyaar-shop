@@ -13,4 +13,8 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('order/success/<int:order_id>/', views.order_success, name='order_success'),
     path('my-orders/', views.my_orders, name='my_orders'),
+    
+    # مسیرهای اضافه شده برای درگاه استریپ
+    path('payment/success/', views.payment_success_view, name='payment_success'),
+    path('payment/cancel/', views.payment_cancel_view, name='payment_cancel'),
 ]
