@@ -106,14 +106,24 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media / Cloudinary Configuration
+# Media / Cloudinary Configuration with JFIF to JPG Normalizer
+from cloudinary_storage.storage import MediaCloudinaryStorage
+
+class NormalizedMediaCloudinaryStorage(MediaCloudinaryStorage):
+    def get_available_name(self, name, max_length=None):
+        # تبدیل پسوندهای jfif یا jpe به jpg استاندارد
+        ext = os.path.splitext(name)[1].lower()
+        if ext in ['.jfif', '.jpe']:
+            name = os.path.splitext(name)[0] + '.jpg'
+        return super().get_available_name(name, max_length)
+
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+DEFAULT_FILE_STORAGE = 'shopyaar.settings.NormalizedMediaCloudinaryStorage'
 MEDIA_URL = '/media/'
 
 # Default primary key
