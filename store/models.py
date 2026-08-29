@@ -73,12 +73,35 @@ class Product(models.Model):
         max_length=200,
         verbose_name='Name'
     )
+
+    # ========================================================
+    # PRODUCT CODE
+    # ========================================================
+    #
+    # کد اختصاصی کالا
+    #
+    # ادمین می‌تواند خودش وارد کند:
+    #
+    # WATCH-001
+    # BAG-025
+    # SHOE-100
+    #
+    # اگر خالی باشد، هنگام ذخیره به صورت خودکار
+    # یک کد مثل SAAP-000001 ساخته می‌شود.
+    #
+    # null=True برای جلوگیری از مشکل migration
+    # محصولات قدیمی است.
+    # ========================================================
+
     product_code = models.CharField(
         max_length=50,
         unique=True,
         db_index=True,
+        blank=True,
+        null=True,
         verbose_name='Product Code'
     )
+
     slug = models.SlugField(
         unique=True,
         allow_unicode=True
@@ -140,9 +163,24 @@ class Product(models.Model):
 
     def __str__(self):
 
+        if self.product_code:
+
+            return (
+                f"{self.name} "
+                f"[{self.product_code}]"
+            )
+
         return self.name
 
+    # ========================================================
+    # SAVE PRODUCT
+    # ========================================================
+
     def save(self, *args, **kwargs):
+
+        # ----------------------------------------------------
+        # ساخت Slug
+        # ----------------------------------------------------
 
         if not self.slug:
 
@@ -156,7 +194,80 @@ class Product(models.Model):
                 f"{uuid.uuid4().hex[:6]}"
             )
 
+        # ----------------------------------------------------
+        # ساخت خودکار Product Code
+        # ----------------------------------------------------
+
+        if not self.product_code:
+
+            self.product_code = self.generate_product_code()
+
         super().save(*args, **kwargs)
+
+    # ========================================================
+    # GENERATE PRODUCT CODE
+    # ========================================================
+
+    @classmethod
+    def generate_product_code(cls):
+
+        """
+        ساخت کد یکتای کالا.
+
+        مثال:
+
+        SAAP-000001
+        SAAP-000002
+        SAAP-000003
+        """
+
+        last_product = (
+            cls.objects
+            .filter(
+                product_code__startswith='SAAP-'
+            )
+            .order_by('-id')
+            .first()
+        )
+
+        if last_product and last_product.product_code:
+
+            try:
+
+                last_number = int(
+                    last_product.product_code.split('-')[-1]
+                )
+
+            except (
+                ValueError,
+                TypeError
+            ):
+
+                last_number = 0
+
+        else:
+
+            last_number = 0
+
+        while True:
+
+            next_number = last_number + 1
+
+            code = (
+                f"SAAP-{next_number:06d}"
+            )
+
+            if not cls.objects.filter(
+                product_code=code
+            ).exists():
+
+                return code
+
+            last_number = next_number
+
+    # ========================================================
+    # ABSOLUTE URL
+    # ========================================================
 
     def get_absolute_url(self):
 
@@ -167,6 +278,10 @@ class Product(models.Model):
             }
         )
 
+    # ========================================================
+    # FINAL PRICE
+    # ========================================================
+
     @property
     def final_price(self):
 
@@ -176,6 +291,10 @@ class Product(models.Model):
             else self.price
         )
 
+    # ========================================================
+    # HAS DISCOUNT
+    # ========================================================
+
     @property
     def has_discount(self):
 
@@ -184,6 +303,10 @@ class Product(models.Model):
             and self.discount_price < self.price
         )
 
+    # ========================================================
+    # DISCOUNT PERCENT
+    # ========================================================
+
     @property
     def discount_percent(self):
 
@@ -191,7 +314,10 @@ class Product(models.Model):
 
             return int(
                 (
-                    (self.price - self.discount_price)
+                    (
+                        self.price
+                        - self.discount_price
+                    )
                     / self.price
                 ) * 100
             )
@@ -470,6 +596,23 @@ class OrderItem(models.Model):
         max_length=200
     )
 
+    # ========================================================
+    # PRODUCT CODE SNAPSHOT
+    # ========================================================
+    #
+    # کد کالا در زمان خرید داخل سفارش ذخیره می‌شود.
+    #
+    # بنابراین اگر بعدها کد محصول تغییر کند،
+    # سفارش‌های قبلی همچنان کد زمان خرید را دارند.
+    # ========================================================
+
+    product_code = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        verbose_name='Product Code'
+    )
+
     price = models.DecimalField(
         max_digits=12,
         decimal_places=0
@@ -485,6 +628,14 @@ class OrderItem(models.Model):
 
     def __str__(self):
 
+        if self.product_code:
+
+            return (
+                f"{self.quantity} x "
+                f"{self.product_name} "
+                f"[{self.product_code}]"
+            )
+
         return (
             f"{self.quantity} x "
             f"{self.product_name}"
@@ -494,5 +645,6 @@ class OrderItem(models.Model):
     def subtotal(self):
 
         return (
-            self.price * self.quantity
+            self.price
+            * self.quantity
         )
