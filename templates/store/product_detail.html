@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} | Shopyaar{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-10">
+    <div class="grid md:grid-cols-2 gap-10">
+        <div class="bg-white rounded-3xl overflow-hidden shadow-lg border border-slate-100">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full aspect-square object-cover">
+            {% else %}
+            <div class="aspect-square bg-slate-100 flex items-center justify-center text-6xl text-slate-300">📦</div>
+            {% endif %}
+        </div>
+        <div class="flex flex-col">
+            <span class="text-sm text-primary-600 font-medium mb-2">{{ product.category.name }}</span>
+            <h1 class="text-3xl font-bold text-slate-800 mb-2">{{ product.name }}</h1>
+            {% if product.product_code %}
+            <p class="text-sm text-slate-500 mb-4">Code: <span class="font-mono font-semibold text-slate-700">{{ product.product_code }}</span></p>
+            {% endif %}
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-3xl font-extrabold text-primary-700">€{{ product.final_price|floatformat:2 }}</span>
+                {% if product.has_discount %}
+                <span class="text-lg text-slate-400 line-through">€{{ product.price|floatformat:2 }}</span>
+                <span class="bg-red-100 text-red-600 text-sm font-bold px-2.5 py-1 rounded-full">{{ product.discount_percent }}% OFF</span>
+                {% endif %}
+            </div>
+            <div class="prose prose-slate text-slate-600 mb-8 leading-relaxed">{{ product.description|linebreaks }}</div>
+            <div class="flex items-center gap-2 mb-6 text-sm">
+                {% if product.stock > 0 %}
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span class="text-emerald-600 font-medium">In Stock ({{ product.stock }})</span>
+                {% else %}
+                <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                <span class="text-red-600 font-medium">Out of Stock</span>
+                {% endif %}
+            </div>
+            {% if product.stock > 0 %}
+            <a href="{% url 'store:add_to_cart' product.id %}" class="btn-primary text-white text-center py-3.5 rounded-2xl font-bold shadow-lg hover:shadow-xl transition text-lg">
+                Add to Cart
+            </a>
+            {% else %}
+            <button disabled class="bg-slate-200 text-slate-500 text-center py-3.5 rounded-2xl font-bold cursor-not-allowed">Out of Stock</button>
+            {% endif %}
+
+            <!-- Share buttons -->
+            <div class="mt-8 pt-6 border-t border-slate-100">
+                <p class="text-sm font-medium text-slate-600 mb-3">Share this product</p>
+                <div class="flex flex-wrap gap-2">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" rel="noopener"
+                       class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition">
+                        Facebook
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ product.name|urlencode }}" target="_blank" rel="noopener"
+                       class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-500 text-white text-sm font-medium hover:bg-sky-600 transition">
+                        X / Twitter
+                    </a>
+                    <a href="https://wa.me/?text={{ product.name|urlencode }}%20{{ request.build_absolute_uri }}" target="_blank" rel="noopener"
+                       class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 text-white text-sm font-medium hover:bg-emerald-600 transition">
+                        WhatsApp
+                    </a>
+                    <a href="https://t.me/share/url?url={{ request.build_absolute_uri }}&text={{ product.name|urlencode }}" target="_blank" rel="noopener"
+                       class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-400 text-white text-sm font-medium hover:bg-sky-500 transition">
+                        Telegram
+                    </a>
+                    <button type="button" onclick="navigator.clipboard.writeText(window.location.href); this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy link', 2000)"
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-200 text-slate-700 text-sm font-medium hover:bg-slate-300 transition">
+                        Copy link
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if related_products %}
+    <section class="mt-16">
+        <h2 class="text-2xl font-bold text-slate-800 mb-6">Related Products</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+            {% for product in related_products %}
+            {% include 'store/partials/product_card.html' %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
