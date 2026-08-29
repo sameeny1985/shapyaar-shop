@@ -73,7 +73,12 @@ class Product(models.Model):
         max_length=200,
         verbose_name='Name'
     )
-
+    product_code = models.CharField(
+        max_length=50,
+        unique=True,
+        db_index=True,
+        verbose_name='Product Code'
+    )
     slug = models.SlugField(
         unique=True,
         allow_unicode=True
