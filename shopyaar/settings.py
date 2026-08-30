@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django.contrib.sitemaps',
 
     # Third Party
     'allauth',
@@ -275,15 +276,7 @@ CLOUDINARY_STORAGE = {
 
     'API_SECRET': CLOUDINARY_API_SECRET,
 
-    # ========================================================
-    # Preserve original uploaded filename
-    # ========================================================
-
     'EXCLUDE_DELETE_ORPHANED_MEDIA': False,
-
-    # ========================================================
-    # Upload configuration
-    # ========================================================
 
     'PREFIX': 'shopyaar',
 
@@ -291,11 +284,7 @@ CLOUDINARY_STORAGE = {
 
 
 # ============================================================
-# DEFAULT MEDIA STORAGE
-# ============================================================
-
-# ============================================================
-# CLOUDINARY CONFIGURATION
+# CLOUDINARY CONFIGURATION (override)
 # ============================================================
 
 CLOUDINARY_STORAGE = {
@@ -325,20 +314,12 @@ CLOUDINARY_STORAGE = {
 
 STORAGES = {
 
-    # --------------------------------------------------------
-    # USER UPLOADED FILES
-    # --------------------------------------------------------
-
     'default': {
 
         'BACKEND':
             'cloudinary_storage.storage.MediaCloudinaryStorage',
 
     },
-
-    # --------------------------------------------------------
-    # STATIC FILES
-    # --------------------------------------------------------
 
     'staticfiles': {
 
@@ -356,17 +337,10 @@ STORAGES = {
 
 MEDIA_URL = '/media/'
 
-# ============================================================
-# MEDIA URL
-# ============================================================
-
-
 
 # ============================================================
 # CLOUDINARY IMAGE SETTINGS
 # ============================================================
-
-# این تنظیمات برای اطمینان از رفتار صحیح URL تصاویر هستند.
 
 CLOUDINARY_IMAGE_FORMATS = [
 
