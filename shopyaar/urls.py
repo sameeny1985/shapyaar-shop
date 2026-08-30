@@ -25,6 +25,17 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path("googleff764f24dc120cc.html", google_verification),
     path("", include("store.urls")),
+    path(
+        "sitemap.xml",
+        sitemap,
+        {
+            "sitemaps": {
+                "products": ProductSitemap,
+                "static": StaticSitemap,
+            }
+        },
+        name="django.contrib.sitemaps.views.sitemap",
+    ),
 ]
 
 if make_admin is not None:
