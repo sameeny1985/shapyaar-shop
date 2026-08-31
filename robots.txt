@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sory-shop.onrender.com/sitemap.xml
+Sitemap: https://lyloxshop.onrender.com/sitemap.xml
