@@ -204,7 +204,7 @@ def checkout(request):
         for item in order.items.all():
             line_items.append({
                 'price_data': {
-                    'currency': 'usd',
+                    'currency': 'eur',
                     'product_data': {
                         'name': item.product_name,
                     },
