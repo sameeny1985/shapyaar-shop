@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from django.http import HttpResponse
 from django.contrib.sitemaps.views import sitemap
 from store.sitemaps import ProductSitemap, StaticSitemap
+from accounts.views import fix_empty_usernames
 try:
     from account.views import make_admin
 except ImportError:
@@ -24,6 +25,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
     path("googleff764f24dc120cc.html", google_verification),
+    path('fix-empty-usernames/', fix_empty_usernames),
     path("", include("store.urls")),
     path(
         "sitemap.xml",
