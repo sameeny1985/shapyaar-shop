@@ -372,7 +372,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # DJANGO SITES
 # ============================================================
 
-SITE_ID = 1
+SITE_ID = 2
 
 
 # ============================================================
@@ -419,43 +419,19 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 # ============================================================
 
 SOCIALACCOUNT_PROVIDERS = {
-
     'google': {
-
-        'SCOPE': [
-
-            'profile',
-
-            'email',
-
-        ],
-
+        'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {
-
             'access_type': 'online',
-
             'prompt': 'select_account',
-
         },
-
         'APP': {
-
-            'client_id': os.environ.get(
-                'GOOGLE_CLIENT_ID',
-                ''
-            ),
-
-            'secret': os.environ.get(
-                'GOOGLE_CLIENT_SECRET',
-                ''
-            ),
-
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID', ''),
+            'secret': os.environ.get('GOOGLE_CLIENT_SECRET', ''),
             'key': '',
-
         },
     }
 }
-
 
 # ============================================================
 # ADMIN EMAIL
