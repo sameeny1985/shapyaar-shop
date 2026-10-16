@@ -14,7 +14,14 @@ import dj_database_url
 # ============================================================
 
 load_dotenv()
+SOCIALACCOUNT_AUTO_SIGNUP = True
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
 
+# اتصال خودکار گوگل به همان ایمیل موجود
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 
 # ============================================================
 # BASE DIRECTORY
